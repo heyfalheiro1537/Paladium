@@ -56,7 +56,7 @@ export const authApi = {
     },
 
     getMe: async (token: string): Promise<User> => {
-        console.log("Getting user with token:", token.substring(0, 20) + "...")
+
 
         const response = await fetch(`${API_URL}/auth/me`, {
             headers: {

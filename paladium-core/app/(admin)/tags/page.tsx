@@ -52,6 +52,7 @@ export default function QualityAssurancePage() {
 
             const images = await response.json()
 
+
             // Transform API data to match our Annotation interface
             const transformedData: Annotation[] = images.map((img: any) => ({
                 id: String(img.id),
@@ -114,8 +115,7 @@ export default function QualityAssurancePage() {
 
                 setEditableTags(prev => prev.map(t => t === oldTag ? newTag : t));
 
-                // Optional: Show success message
-                console.log(result.message);
+
 
             } catch (error: any) {
                 console.error('Error renaming tag:', error);

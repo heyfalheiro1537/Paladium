@@ -1,4 +1,4 @@
-import os
+import base64
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -212,6 +212,11 @@ def get_ai_suggestions(image_id: int, db: Session = Depends(get_db)):
         "Return them as a comma-separated list only."
     )
 
+    image_path = f".{image.url}"
+    with open(image_path, "rb") as f:
+        image_bytes = f.read()
+        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+
     resp = client.responses.create(
         model="gpt-4o-mini",
         input=[
@@ -220,8 +225,8 @@ def get_ai_suggestions(image_id: int, db: Session = Depends(get_db)):
                 "content": [
                     {"type": "input_text", "text": prompt},
                     {
-                        "type": "image_url",
-                        "url": f"{os.environ['BASE_URL']}{image.url}",
+                        "type": "input_image",
+                        "image_url": f"data:image/jpeg;base64,{image_b64}",
                     },
                 ],
             }

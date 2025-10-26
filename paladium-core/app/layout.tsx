@@ -19,12 +19,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Heyder", url: "https://heyder.dev" }],
 }
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
   return (
+
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>

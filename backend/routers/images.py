@@ -1,12 +1,15 @@
+import base64
 from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse
+from openai import OpenAI
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from pathlib import Path
 import uuid
 from dal.models.annotator import Annotation
 import filetype
+from sqlalchemy import func
 
 
 from dal.models import Image, Tags, Groups
@@ -49,10 +52,21 @@ def get_all_images(db: Session = Depends(get_db)):
     images = db.query(Image).all()
     result = []
 
+    # Get popular tags once for reuse
+    popular_tags = (
+        db.query(Tags.name, func.count(Tags.id).label("count"))
+        .join(Annotation.tags)
+        .group_by(Tags.name)
+        .order_by(func.count(Tags.id).desc())
+        .limit(10)
+        .all()
+    )
+    popular = ", ".join([row[0] for row in popular_tags]) if popular_tags else "none"
+
     for img in images:
         # Get all annotations for this image
         annotations = db.query(Annotation).filter(Annotation.image_id == img.id).all()
-        total_annotators = len(annotations)  # Each annotation is from one annotator
+        total_annotators = len(annotations)
 
         # Calculate tag statistics from annotations
         tag_stats = {}
@@ -81,12 +95,12 @@ def get_all_images(db: Session = Depends(get_db)):
         # Sort tags by count (most popular first)
         tags_with_stats.sort(key=lambda x: x["count"], reverse=True)
 
-        # Check for conflicts (tags with agreement < 80%)
-        has_conflict = (
-            any(tag_data["percentage"] < 80 for tag_data in tags_with_stats)
-            if tags_with_stats and total_annotators > 1
-            else False
-        )
+        # Use AI to determine if there's a conflict
+        has_conflict = False
+        if tags_with_stats and total_annotators > 1:
+            has_conflict = check_tag_conflict_with_ai(
+                img, tags_with_stats, total_annotators, popular
+            )
 
         result.append(
             {
@@ -106,6 +120,73 @@ def get_all_images(db: Session = Depends(get_db)):
         )
 
     return result
+
+
+def check_tag_conflict_with_ai(
+    image: Image, tags_with_stats: list, total_annotators: int, popular_tags: str
+) -> bool:
+    """Use AI to determine if there's a tagging conflict for this image"""
+
+    if not getattr(image, "url", None):
+        return False
+
+    # Format tag information for the prompt
+    tag_summary = []
+    for tag in tags_with_stats:
+        tag_summary.append(
+            f"- '{tag['name']}': {tag['count']}/{total_annotators} annotators ({tag['percentage']}%)"
+        )
+    tag_info = "\n".join(tag_summary)
+
+    prompt = (
+        "You are analyzing image annotation consistency. "
+        f"This image was tagged by {total_annotators} annotators.\n\n"
+        f"Tags assigned:\n{tag_info}\n\n"
+        f"Common tags in dataset: {popular_tags}\n\n"
+        "Based on the image content and tag distribution, is there a significant conflict "
+        "in how annotators interpreted this image? Consider:\n"
+        "- Are the tags semantically similar or contradictory?\n"
+        "- Does the image have ambiguous content that could cause disagreement?\n"
+        "- Is low agreement justified by image complexity?\n\n"
+        "Answer with ONLY 'YES' if there's a conflict or 'NO' if annotations are reasonably consistent."
+    )
+
+    client = None
+    try:
+        client = OpenAI()
+
+        image_path = f".{image.url}"
+        with open(image_path, "rb") as f:
+            image_bytes = f.read()
+            image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"},
+                        },
+                    ],
+                }
+            ],
+            max_tokens=10,
+        )
+
+        answer = resp.choices[0].message.content.strip().upper()
+        return "YES" in answer
+
+    except Exception as e:
+        # Fallback to percentage-based check if AI fails
+        print(f"AI conflict check failed for image {image.id}: {e}")
+        return any(tag["percentage"] < 80 for tag in tags_with_stats)
+    finally:
+        if client:
+            client.close()
 
 
 @router.delete("/{image_id}")

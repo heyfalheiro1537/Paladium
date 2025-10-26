@@ -60,8 +60,7 @@ def admin_register(data: RegisterAdmin, db: Session = Depends(get_db)):
 def annotator_login(data: LoginData, db: Session = Depends(get_db)):
     """Annotator login endpoint"""
     annotator = db.query(Annotator).filter(Annotator.email == data.email).first()
-    print(annotator.password_hash)
-    print(data)
+
     if not annotator or not verify_password(data.password, annotator.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 

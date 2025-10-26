@@ -55,7 +55,7 @@ export default function UserClassificationPage() {
     const fetchImages = async (annotatorId: string) => {
         try {
 
-            console.log("url:", `${API_BASE_URL}/annotations/images/${annotatorId}`)
+
             const response = await fetch(`${API_BASE_URL}/annotations/images/${annotatorId}`)
 
             if (!response.ok) {
@@ -172,7 +172,7 @@ export default function UserClassificationPage() {
             const availableSlots = MAX_TAGS - editableTags.length
 
             const newTags = suggestions
-                .slice(0, availableSlots + 1)
+                .slice(0, availableSlots)
                 .filter((tag: string) => !editableTags.some(t => t.toLowerCase() === tag.toLowerCase()))
 
 
