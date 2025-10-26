@@ -9,10 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from dal.setup import lifespan
 from routers import annotations, annotators, auth, groups, images
 
-# remove when docker
-from dotenv import load_dotenv
-
-load_dotenv()
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)

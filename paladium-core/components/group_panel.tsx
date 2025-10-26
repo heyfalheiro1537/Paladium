@@ -1,6 +1,6 @@
 "use client"
 
-import type { Group } from "@/types/group"
+import type { GroupType } from "@/types/group"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Check, Plus, X } from "lucide-react"
@@ -8,7 +8,7 @@ import { useMemo, useState } from "react"
 import { Checkbox } from "./ui/checkbox"
 
 export default function GroupsPanel({ groups, checkedIds, onToggleGroup, onClearChecked, onApply }: {
-    groups: Group[]
+    groups: GroupType[]
     checkedIds: Set<string>
     onToggleGroup: (id: string) => void
     onClearChecked: () => void

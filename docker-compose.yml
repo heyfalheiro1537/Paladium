@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      FRONTEND_URL: "http://localhost:3000"
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    
+
+  frontend:
+    build:
+      context: ./paladium-core
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "http://127.0.0.1:8000" 
+    environment:
+      NEXT_PUBLIC_API_URL: "http://127.0.0.1:8000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
