@@ -78,8 +78,10 @@ cp backend/.env.example backend/.env
 ```
 
 # 3. Open the env files and set your variables
-# Required: add your OpenAI API key (used for AI-powered features)
 
+```backend/.env
+OPENAI_API_KEY= <your-api-key>
+```
 
 # 4. Build the image 
 ```bash
