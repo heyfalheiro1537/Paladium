@@ -217,24 +217,24 @@ def get_ai_suggestions(image_id: int, db: Session = Depends(get_db)):
         image_bytes = f.read()
         image_b64 = base64.b64encode(image_bytes).decode("utf-8")
 
-    resp = client.responses.create(
+    resp = client.chat.completions.create(
         model="gpt-4o-mini",
-        input=[
+        messages=[
             {
                 "role": "user",
                 "content": [
-                    {"type": "input_text", "text": prompt},
+                    {"type": "text", "text": prompt},
                     {
-                        "type": "input_image",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}",
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"},
                     },
                 ],
             }
         ],
-        max_output_tokens=150,
+        max_tokens=150,
     )
 
-    text = getattr(resp, "output_text", None) or ""
+    text = resp.choices[0].message.content or ""
 
     raw = text.replace("\n", ",").replace("•", ",").replace(";", ",").lower()
     tags = [t.strip().strip("#").replace(" ", "-") for t in raw.split(",")]

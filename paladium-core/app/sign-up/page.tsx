@@ -86,9 +86,6 @@ export default function AdminRegisterPage() {
                             <div className="text-lg font-medium text-green-600">
                                 Registration successful!
                             </div>
-                            <p className="text-sm text-muted-foreground">
-                                Redirecting to dashboard...
-                            </p>
                         </div>
                     ) : (
                         <form onSubmit={handleRegister} className="space-y-4">

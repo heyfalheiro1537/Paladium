@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sparkles, X, CheckCircle2, Clock, LogOut, Loader2, BarChart3, Target } from "lucide-react"
+import { Sparkles, X, CheckCircle2, Clock, LogOut, Loader2, BarChart3, Target, User } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/use-auth"
 import { ImageData } from "@/types/image_data"
@@ -189,6 +189,10 @@ export default function UserClassificationPage() {
         } finally {
             setIsAISuggesting(false)
         }
+    }
+    const handleChangePassword = () => {
+        // Implement navigation to change password page
+        window.location.href = '/change-password';
     }
 
     const handleSaveClassification = async () => {
@@ -373,10 +377,16 @@ export default function UserClassificationPage() {
                                 Classify images by adding up to {MAX_TAGS} tags per image
                             </p>
                         </div>
-                        <Button onClick={handleLogout} variant="outline" className="gap-2">
-                            <LogOut className="h-4 w-4" />
-                            Logout
-                        </Button>
+                        <div>
+                            <Button onClick={handleChangePassword} variant="outline" className="gap-2 mr-2">
+                                <User className="h-4 w-4 " />
+                                Change Password
+                            </Button>
+                            <Button onClick={handleLogout} variant="outline" className="gap-2 mr-2 hover:text-red-600 hover:border-red-600 hover:bg-red-50">
+                                <LogOut className="h-4 w-4" />
+                                Logout
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <AnnotatorDashboard stats={stats ? {
