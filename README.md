@@ -33,16 +33,18 @@ This project leveraged AI at key stages to speed up iteration and improve qualit
 - Used **OpenAI/ChatGPT** to explore user personas, map the **end-to-end journey**, and align on success criteria.  
 - Iterated “back-and-forth” on **flows, wireframes, and copy** to refine the user experience.  
 - Captured assumptions and open questions as checklists to guide implementation.
+- Results: Helped gain insights on Product Design
 
 ### 💻 Coding & Integration
 - Generated **page templates** and base components with **Claude**, adapted to the project’s style system.  
 - Collaboratively debugged **backend integration** (authentication, environment variables, CORS issues) with Cursor.  
 - Used AI for code refactoring, improving **error handling**, and maintaining **type safety**.
+- Results: Speed up development
 
 ### 🐳 Dockerization & DevOps
 - Followed **AI-guided step-by-step Dockerization by OpenAI and Claude** (along with documentation), including build layers, service linking. 
 - Standardized **`.env` management** (e.g., `OPENAI_API_KEY`, `NEXT_PUBLIC_API_URL`) across environments.  
-- Added AI-driven troubleshooting and validation tips for `docker compose up --build` and runtime logs.
+- Result: Added AI-driven troubleshooting and validation tips for `docker compose up --build` and runtime logs.
 
 
 ## 🗂 Repo Layout
@@ -114,8 +116,4 @@ Admins review diverging tags, approve or override.
 
 Multi-stage Docker build
 
-
-## 🧭 AI Assistance
-
-- Planning, implementation, review steps documented.
 
